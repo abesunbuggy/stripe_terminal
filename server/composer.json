@@ -1,0 +1,10 @@
+{
+  "require": {
+    "stripe/stripe-php": "^10.19",
+    "vlucas/phpdotenv": "^5.3",
+    "cboden/ratchet": "^0.4.4"
+  },
+  "scripts": {
+    "start": "cd public && php -S 0.0.0.0:4242"
+  }
+}

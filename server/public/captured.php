@@ -38,7 +38,7 @@ try {
     </style>
     <script>
       // Countdown timer
-      var countdown = 3;
+      var countdown = 10;
       var countdownTimer = setInterval(function() {
         countdown--;
         document.getElementById("countdown").innerText = countdown;
@@ -57,9 +57,10 @@ try {
         </header>
         <div class="sr-payment-summary completed-view">
           <h1>Operation Successful</h1>
-          <div class="countdown" id="countdown">3</div>
+          <h2>Wait a moment...</h2>
+          <div class="countdown" id="countdown">10</div>
         </div>
-        <pre><?= json_encode($paymentIntent, JSON_PRETTY_PRINT); ?></pre>
+        <!-- <pre>< json_encode($paymentIntent, JSON_PRETTY_PRINT); ?></pre> -->
       </div>
     </div>
   </body>

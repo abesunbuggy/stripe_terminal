@@ -1,6 +1,69 @@
 
     <!DOCTYPE html>
-    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍Search for names..">
+    <style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .header-table th,
+  .header-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .header-table th {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+
+  .header-table th.active {
+    background-color: #d4f1d2;
+  }
+
+  .header-table button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  input[type="number"] {
+    width: 60px;
+  }
+
+  .table-container {
+    overflow-y: auto;
+    height: 400px; /* set the height to match your table */
+  }
+
+  /* Set the same column width for both header and content tables */
+  .header-table th,
+  .table-container table td {
+    width: 25%; /* You can adjust this value based on your preference */
+  }
+</style>
+
+
+<!-- Move the header row outside the table-container -->
+<table class="header-table" style="width: 100%;">
+<thead>
+    <tr>
+      <th class="theths" onclick="sortTable(0)">Name</th>
+      <th   class="theths" onclick="sortTable(1)">Amount</th>
+      <th  class="theths"  onclick="sortTable(2)">Reservation Number</th>
+      <th  >Action</th>
+    </tr>
+</thead>
+</table>
 
     <?php
     // <?php
@@ -21,20 +84,15 @@ try {
 
     echo <<<HTML
     <div class="table-container">
-    <table class="header-table" style="width: 100%;">
-        <tr>
-            <th onclick="sortTable(0)">Name</th>
-            <th onclick="sortTable(1)">Amount</th>
-            <th onclick="sortTable(2)">Reservation Number</th>
-            <th>Action</th>
-        </tr>
+    <table class="inside-table">
     HTML;
 
     // Display authorized payments
     foreach ($authorizedPaymentsSlice as $payment) {
         // Display payment details
         echo <<<HTML
-        <tr>
+        <tbody class="thetbody">
+        <tr class="trs">
             <td>{$payment->metadata->name}</td>
             <td>{$payment->amount}</td>
             <td>{$payment->metadata->reservation_number}</td>
@@ -45,6 +103,7 @@ try {
                 </form>
             </td>
         </tr>
+        </tbody>
         HTML;
     }
 
@@ -64,53 +123,13 @@ try {
     echo $th;
 }
 ?>
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f0f0f0;
-        cursor: pointer;
-    }
-    th.active {
-        background-color: #d4f1d2;
-    }
-    button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 8px;
-    }
-    input[type="number"] {
-        width: 60px;
-    }
-    .table-container {
-        overflow-y: auto;
-    }
-    .header-table {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-</style>
 
 <div>
     <form action="" method="GET">
         <label for="limit">Show:</label>
         <input type="number" id="limit" name="limit" min="1" max="100" value="<?= $limit ?>">
+        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for names..">
+
         <button type="submit">Apply</button>
     </form>
 </div>
@@ -121,7 +140,7 @@ try {
         let input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("searchInput");
         filter = input.value.toUpperCase();
-        table = document.querySelector("table");
+        table = document.querySelector(".inside-table");
         tr = table.getElementsByTagName("tr");
 
         for (i = 1; i < tr.length; i++) {
@@ -140,41 +159,46 @@ try {
         }
     }
 
-    // Sorting function
-    let currentSortColumn = -1;
-  // Sort the table rows based on the selected column
-  function sortTable(col) {
-        const table = document.querySelector("table");
-        const tbody = table.querySelector("tbody");
-        const rows = Array.from(tbody.querySelectorAll("tr"));
+   // Sorting function
+   let currentSortColumn = -1;
 
-        const sortedRows = rows.sort((a, b) => {
-            const aText = a.cells[col].textContent.trim();
-            const bText = b.cells[col].textContent.trim();
-            return aText.localeCompare(bText, undefined, { numeric: true, sensitivity: 'base' });
-        });
+// Sort the table rows based on the selected column
+function sortTable(col) {
+  const table = document.querySelector(".table-container table tbody");
+  const tbody = document.querySelector(".thetbody");
+  const rows = Array.from(document.querySelectorAll(".trs"));
 
-        if (currentSortColumn === col) {
-            sortedRows.reverse();
-            currentSortColumn = -1;
-        } else {
-            currentSortColumn = col;
-        }
+  // Exclude the header row from sorting
+  const headerRow = rows.shift();
 
-        tbody.innerHTML = '';
-        sortedRows.forEach(row => tbody.appendChild(row));
+  const sortedRows = rows.sort((a, b) => {
+    const aText = a.cells[col].textContent.trim();
+    const bText = b.cells[col].textContent.trim();
 
-        const ths = table.querySelectorAll("th");
-        ths.forEach(th => th.classList.remove("active"));
-        ths[col].classList.add("active");
+    // Check if the column is the "Amount" column
+    if (col === 1) {
+      const aAmount = parseFloat(aText.replace(/[^0-9.-]+/g, ""));
+      const bAmount = parseFloat(bText.replace(/[^0-9.-]+/g, ""));
+      return aAmount - bAmount;
     }
 
-        // Synchronize horizontal scroll positions between header table and main table
-        const headerTable = document.querySelector(".header-table");
-    const mainTable = document.querySelector(".table-container table:not(.header-table)");
+    return aText.localeCompare(bText, undefined, { numeric: true, sensitivity: "base" });
+  });
 
-    mainTable.addEventListener("scroll", function () {
-        headerTable.scrollLeft = mainTable.scrollLeft;
-    });
+  if (currentSortColumn === col) {
+    sortedRows.reverse();
+    currentSortColumn = -1;
+  } else {
+    currentSortColumn = col;
+  }
 
+  tbody.innerHTML = '';
+  tbody.appendChild(headerRow); // Add the header row back
+  sortedRows.forEach(row => tbody.appendChild(row));
+
+  const ths = document.querySelectorAll(".theths");
+  ths.forEach(th => th.classList.remove("active"));
+  ths[col].classList.add("active");
+  console.log(ths)
+}
 </script>

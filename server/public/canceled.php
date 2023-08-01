@@ -25,7 +25,7 @@ try {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stripe Terminal Sample</title>
+    <title>Stripe Terminal </title>
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/global.css" />
@@ -38,7 +38,7 @@ try {
         </header>
         <div class="sr-payment-summary completed-view">
           <h1>Your payment was canceled</h1>
-          <button onclick="window.location.href = '/';">Restart demo</button>
+          <button onclick="window.location.href = '/';">Restart App</button>
         </div>
       </div>
       <div class="sr-content">

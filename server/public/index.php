@@ -18,36 +18,7 @@ try {
   http_response_code(500);
   exit;
 }
-try {
-  // Retrieve authorized payments
-  $authorizedPayments = $stripe->paymentIntents->search([
-      'query' => 'status:"requires_capture"',
-      'limit'=>100,
-  ]);
-
-  // Display authorized payments
-  foreach ($authorizedPayments->data as $payment) {
-      $expirationTime = strtotime($payment->created) + (45 * 3600); // 45 hours expiration
-
-      // Calculate time left until expiration
-      $timeLeft = $expirationTime - time();
-      $hoursLeft = floor($timeLeft / 3600);
-      $minutesLeft = floor(($timeLeft % 3600) / 60);
-
-      // Display payment details
-      echo "<p>Name: {$payment->metadata->name}</p>";
-      echo "<p>Amount: {$payment->amount}</p>";
-      echo "<p>Reservation Number: {$payment->metadata->reservation_number}</p>";
-      // echo "<p>Time Left: {$hoursLeft} hours, {$minutesLeft} minutes</p>";
-      echo "<form action='captured.php' method='POST'>";
-      echo "<input type='hidden' name='payment_intent' value='{$payment->id}' />";
-      echo "<button type='submit'>Capture</button>";
-      echo "</form>";
-  }
-} catch (\Throwable $th) {
-  echo $th;
-}
-  
+include('display_payments.php');
 ?>
 
 <!DOCTYPE html>
